@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector</title>
+    <link rel="icon" href="data:," />
+  
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 400px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      resize: none;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .result {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Fake News Detector</h1>
+    <textarea id="newsText" placeholder="Enter news text here..."></textarea>
+    <button onclick="predictNews()">Check News</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    async function predictNews() {
+      const newsText = document.getElementById('newsText').value;
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = '';  // Clear previous result
+
+      if (!newsText.trim()) {
+        resultDiv.textContent = 'Please enter some news text!';
+        resultDiv.className = 'result error';
+        return;
+      }
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ news: newsText })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          resultDiv.textContent = `Prediction: ${data.prediction}`;
+          resultDiv.className = 'result';
+        } else {
+          resultDiv.textContent = `Error: ${data.error}`;
+          resultDiv.className = 'result error';
+        }
+      } catch (error) {
+        resultDiv.textContent = 'Failed to connect to the server!';
+        resultDiv.className = 'result error';
+      }
+    }
+  </script>
+</body>
+</html>
